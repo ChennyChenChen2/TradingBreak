@@ -71,7 +71,7 @@ class HomeViewController: UIViewController {
     @objc private func respondToNotification() {
         if let _ = self.navigationController?.topViewController as? HomeViewController {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(identifier: TemperatureViewController.storyboardID)
+            let vc = storyboard.instantiateViewController(withIdentifier: TemperatureViewController.storyboardID)
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -90,7 +90,21 @@ class HomeViewController: UIViewController {
                     self.updateAlarm(activate)
                 } else {
                     self.statusSwitch.isOn = false
-                    self.flashStatus(.error("Push notifications aren't authorized. Enable them in settings."))
+                    
+                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    
+                    let alert = UIAlertController(title: "Notifications have been disabled.", message: "If you would like to enable notifications, please navigate to the settings app to enable them.", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+
+                    }))
+                    
+                    alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { (action) in
+                            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    }))
+                    
+                    DispatchQueue.main.async {
+                        self.present(alert, animated: false, completion: nil)
+                    }
                 }
             }
         }
@@ -110,6 +124,7 @@ class HomeViewController: UIViewController {
                     // Show success alert
                     self?.flashStatus(.activated)
                     self?.statusSwitch.isOn = true
+                    self?.switchStatusLabel.text = "On"
                 }
             }
         } else {
@@ -119,6 +134,8 @@ class HomeViewController: UIViewController {
                 Timer.cancelAlarms()
                 self.flashStatus(.deactivated)
                 self.statusSwitch.isOn = false
+                
+                self.switchStatusLabel.text = "Off"
             }
         }
     }

@@ -94,16 +94,17 @@ class Timer {
         case .tomorrowMorning:
             guard let initial = calendar.date(bySettingHour: 10, minute: 0, second: 0, of: Date()),
                 let start = calendar.date(byAdding: .day, value: 1, to: initial) else { return nil }
-            let interval = Double(arc4random_uniform(90*60))
-            return start.advanced(by: interval)
+            let interval = Double(arc4random_uniform(90*60)) as TimeInterval
+            
+            return start.addingTimeInterval(interval)
         case .morning:
             guard let start = calendar.date(bySettingHour: 10, minute: 0, second: 0, of: Date()) else { return nil }
             let interval = Double(arc4random_uniform(90*60))
-            return start.advanced(by: interval)
+            return start.addingTimeInterval(interval)
         case .afternoon:
             guard let start = calendar.date(bySettingHour: 13, minute: 0, second: 0, of: Date()) else { return nil }
             let interval = Double(arc4random_uniform(120*60))
-            return start.advanced(by: interval)
+            return start.addingTimeInterval(interval)
         }
     }
 }

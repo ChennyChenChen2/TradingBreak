@@ -53,7 +53,7 @@ class LoadingViewController: UIViewController {
     
     private func showHomeVC() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewController(identifier: HomeViewController.storyboardID) as? HomeViewController
+        let vc = storyboard.instantiateViewController(withIdentifier: HomeViewController.storyboardID) as? HomeViewController
         let navController = CustomNavigationController()
         
         if let vc = vc {
