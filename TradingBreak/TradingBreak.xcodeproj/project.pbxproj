@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		87BE1F01247DC07700EFD920 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BE1F00247DC07700EFD920 /* Timer.swift */; };
+		87BE1F01247DC07700EFD920 /* TradingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BE1F00247DC07700EFD920 /* TradingTimer.swift */; };
 		87BE1F03247ED34000EFD920 /* TemperatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BE1F02247ED34000EFD920 /* TemperatureViewController.swift */; };
 		87BE1F05247F088900EFD920 /* NYSEBell.wav in Resources */ = {isa = PBXBuildFile; fileRef = 87BE1F04247F088900EFD920 /* NYSEBell.wav */; };
 		87BE1F07247F130400EFD920 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BE1F06247F130400EFD920 /* LoadingViewController.swift */; };
@@ -20,7 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		87BE1F00247DC07700EFD920 /* Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
+		87BE1F00247DC07700EFD920 /* TradingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingTimer.swift; sourceTree = "<group>"; };
 		87BE1F02247ED34000EFD920 /* TemperatureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureViewController.swift; sourceTree = "<group>"; };
 		87BE1F04247F088900EFD920 /* NYSEBell.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = NYSEBell.wav; sourceTree = "<group>"; };
 		87BE1F06247F130400EFD920 /* LoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
@@ -68,7 +68,7 @@
 				87FCD01F2475B94600A8911E /* AppDelegate.swift */,
 				87FCD0212475B94600A8911E /* SceneDelegate.swift */,
 				87FCD0232475B94600A8911E /* HomeViewController.swift */,
-				87BE1F00247DC07700EFD920 /* Timer.swift */,
+				87BE1F00247DC07700EFD920 /* TradingTimer.swift */,
 				87FCD0252475B94600A8911E /* Main.storyboard */,
 				87FCD0282475B94900A8911E /* Assets.xcassets */,
 				87FCD02A2475B94900A8911E /* LaunchScreen.storyboard */,
@@ -154,7 +154,7 @@
 				87FCD0242475B94600A8911E /* HomeViewController.swift in Sources */,
 				87FCD0202475B94600A8911E /* AppDelegate.swift in Sources */,
 				87FCD0222475B94600A8911E /* SceneDelegate.swift in Sources */,
-				87BE1F01247DC07700EFD920 /* Timer.swift in Sources */,
+				87BE1F01247DC07700EFD920 /* TradingTimer.swift in Sources */,
 				87BE1F03247ED34000EFD920 /* TemperatureViewController.swift in Sources */,
 				87BE1F07247F130400EFD920 /* LoadingViewController.swift in Sources */,
 			);

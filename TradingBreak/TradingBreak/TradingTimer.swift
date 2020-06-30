@@ -15,7 +15,7 @@ enum Period {
     case afternoon
 }
 
-class Timer {
+class TradingTimer {
     static let alarmStatusKey = "alarmStatusKey"
     
     class func requestNotificationPermission() {
@@ -39,20 +39,21 @@ class Timer {
         UserDefaults.standard.set(nil, forKey: alarmStatusKey)
     }
     
-    class func scheduleAlarm(_ completion: @escaping (String?) -> ()) {
+    class func scheduleAlarm(_ completion: @escaping (Date?, String?) -> ()) {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour], from: Date())
         let hour = components.hour!
         var fireDate: Date?
         if hour < 10 {
-            fireDate = Timer.randomTime(for: .morning)
+            fireDate = TradingTimer.randomTime(for: .morning)
         } else if hour >= 10 && hour < 13 {
-            fireDate = Timer.randomTime(for: .afternoon)
+            fireDate = TradingTimer.randomTime(for: .afternoon)
         } else {
-            fireDate = Timer.randomTime(for: .tomorrowMorning)
+            fireDate = TradingTimer.randomTime(for: .tomorrowMorning)
         }
         
         if let date = fireDate {
+            UserDefaults.standard.set(date, forKey: alarmStatusKey)
             let content = UNMutableNotificationContent()
             content.title = "A Trading Break"
             content.body = "Time for a trading break!"
@@ -69,14 +70,13 @@ class Timer {
             let notificationCenter = UNUserNotificationCenter.current()
             notificationCenter.add(request) { (error) in
                if error != nil {
-                    completion(error?.localizedDescription)
+                    completion(nil, error?.localizedDescription)
                }
                 
-                UserDefaults.standard.set(date, forKey: alarmStatusKey)
-                completion(nil)
+                completion(date, nil)
             }
         } else {
-            completion("Invalid date used. Try again.")
+            completion(nil, "Invalid date used. Try again.")
         }
     }
     

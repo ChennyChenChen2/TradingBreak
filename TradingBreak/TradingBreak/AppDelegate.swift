@@ -15,7 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         NotificationCenter.default.post(name: Notification.Name.notificationTapped, object: nil)
-        checkNotifications()
         return true
     }
     
@@ -24,10 +23,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     private func checkNotifications() {
+        let nextAlarmDate = UserDefaults.standard.value(forKey: TradingTimer.alarmStatusKey)
+        
+        if let date = nextAlarmDate as? Date {
+            if date.compare(Date()) == .orderedAscending {
+                // expired alarm, clear storage and turn off switch
+                UserDefaults.standard.set(nil, forKey: TradingTimer.alarmStatusKey)
+                NotificationCenter.default.post(name: Notification.Name.notificationTapped, object: nil, userInfo: nil)
+            }
+        }
+        
         UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             DispatchQueue.main.async {
                 if settings.authorizationStatus != .authorized {
-                    UserDefaults.standard.set(nil, forKey: Timer.alarmStatusKey)
+                    UserDefaults.standard.set(nil, forKey: TradingTimer.alarmStatusKey)
                     let dict = ["reset": false]
                     NotificationCenter.default.post(name: Notification.Name.resetNotification, object: nil, userInfo: dict)
                 }

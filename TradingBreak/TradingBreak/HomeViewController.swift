@@ -24,6 +24,7 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var switchStatusLabel: UILabel!
     @IBOutlet weak var statusSwitch: UISwitch!
     @IBOutlet weak var successLabel: UILabel!
+    private var localTimer: Timer?
     
     static let storyboardID = "homeVC"
     static let notificationExistsKey = "notificationExists"
@@ -31,7 +32,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Timer.requestNotificationPermission()
+        TradingTimer.requestNotificationPermission()
         
         self.navigationController?.navigationBar.isHidden = true
         NotificationCenter.default.addObserver(self, selector: #selector(respondToNotification), name: Notification.Name.notificationTapped, object: nil)
@@ -46,13 +47,14 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let nextAlarmDate = UserDefaults.standard.value(forKey: Timer.alarmStatusKey)
+        let nextAlarmDate = UserDefaults.standard.value(forKey: TradingTimer.alarmStatusKey)
         
         if let date = nextAlarmDate as? Date {
             if date.compare(Date()) == .orderedAscending {
                 // expired alarm, clear storage and turn off switch
-                UserDefaults.standard.set(nil, forKey: Timer.alarmStatusKey)
+                UserDefaults.standard.set(nil, forKey: TradingTimer.alarmStatusKey)
                 statusSwitch.isOn = false
+                respondToNotification()
             } else {
                 statusSwitch.isOn = true
             }
@@ -70,9 +72,11 @@ class HomeViewController: UIViewController {
     
     @objc private func respondToNotification() {
         if let _ = self.navigationController?.topViewController as? HomeViewController {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: TemperatureViewController.storyboardID)
-            self.navigationController?.pushViewController(vc, animated: true)
+            DispatchQueue.main.async {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(withIdentifier: TemperatureViewController.storyboardID)
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
         }
     }
     
@@ -84,54 +88,44 @@ class HomeViewController: UIViewController {
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] (settings) in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                if settings.authorizationStatus == .authorized {
                     let activate = self.statusSwitch.isOn
                     self.switchStatusLabel.text = activate ? "On" : "Off"
                     self.updateAlarm(activate)
-                } else {
-                    self.statusSwitch.isOn = false
-                    
-                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-                    
-                    let alert = UIAlertController(title: "Notifications have been disabled.", message: "If you would like to enable notifications, please navigate to the settings app to enable them.", preferredStyle: UIAlertController.Style.alert)
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
-
-                    }))
-                    
-                    alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { (action) in
-                            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    }))
-                    
-                    DispatchQueue.main.async {
-                        self.present(alert, animated: false, completion: nil)
-                    }
-                }
             }
         }
     }
     
     func updateAlarm(_ activate: Bool) {
         if activate {
-            Timer.scheduleAlarm { [weak self] (error) in
+            TradingTimer.scheduleAlarm { [weak self] (date, error) in
                 DispatchQueue.main.async {
                     if let error = error {
                         // Show error
                         self?.flashStatus(.error(error))
                         self?.statusSwitch.isOn = false
                         return
+                    } else if let date = date {
+                        // Show success alert
+                        self?.localTimer = Timer(fire: date, interval: 0, repeats: false, block: { (_) in
+                            self?.respondToNotification()
+                        })
+                        self?.flashStatus(.activated)
+                        self?.statusSwitch.isOn = true
+                        self?.switchStatusLabel.text = "On"
+                        if let timer = self?.localTimer {
+                            RunLoop.main.add(timer, forMode: .default)
+                        }
                     }
-                    
-                    // Show success alert
-                    self?.flashStatus(.activated)
-                    self?.statusSwitch.isOn = true
-                    self?.switchStatusLabel.text = "On"
                 }
             }
         } else {
             UserDefaults.standard.set(false, forKey: HomeViewController.notificationExistsKey)
+            UserDefaults.standard.set(nil, forKey: TradingTimer.alarmStatusKey)
             
             DispatchQueue.main.async {
-                Timer.cancelAlarms()
+                TradingTimer.cancelAlarms()
+                self.localTimer?.invalidate()
+                self.localTimer = nil
                 self.flashStatus(.deactivated)
                 self.statusSwitch.isOn = false
                 
